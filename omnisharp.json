@@ -1,0 +1,13 @@
+{
+  "fileOptions": {
+    "excludeSearchPatterns": [
+      "**/test/**/*.cs"
+    ]
+  },
+  "FormattingOptions": {
+    "EnableEditorConfigSupport": true
+  },
+  "RoslynExtensionsOptions": {
+    "EnableAnalyzersSupport": true
+  }
+}
