@@ -187,4 +187,28 @@ public class DependencyTest : TestClass {
 
     Should.NotThrow(() => dependent._Ready());
   }
+
+  [Test]
+  public void DependentLoadedCalledImmediatelyWhenProvidersAlreadyProvided() {
+    var value1 = new TestDummyValueA();
+    var value2 = new TestDummyValueB();
+    var providerOne = new TestProviderOneNode(value: value1);
+    var providerTwo = new TestProviderTwoNode(value: value2);
+
+    var loadedCalled = false;
+
+    var dependent = new TestDependentNode(
+      loadedCallback: (node) => loadedCalled = true
+    );
+
+    providerOne.AddChild(providerTwo);
+
+    providerOne._Ready();
+    providerTwo._Ready();
+
+    loadedCalled.ShouldBeFalse();
+    providerTwo.AddChild(dependent);
+    dependent._Ready();
+    loadedCalled.ShouldBeTrue();
+  }
 }
