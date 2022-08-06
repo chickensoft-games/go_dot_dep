@@ -1,6 +1,5 @@
 # GoDotDep
-
-[![Discord](https://img.shields.io/badge/Chickensoft%20Discord-%237289DA.svg?style=flat&logo=discord&logoColor=white)][discord] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
+[![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord](https://img.shields.io/badge/Chickensoft%20Discord-%237289DA.svg?style=flat&logo=discord&logoColor=white)][discord] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
 
 Node-based dependency injection for C# Godot games.
 
@@ -112,10 +111,6 @@ public void Loaded() {
 
  In `Loaded()`, dependent nodes are guaranteed to be able to access their dependency values. Below is a complete example.
 
- > What about performance? Dependency resolution runs in `O(n)` for each dependency that is resolved on a node. Once a node has found a provider for its dependency, further access is `O(1)` (instantaneous).
- > 
- > In general, avoid nesting nodes too far away their providers. If needed, you can create a provider lower in your scene tree above many nodes which need a dependency. This provider can depend on a value provided above it and provide it to its descendants, drastically shortening the length of the tree that must be searched for its descendants to resolve their dependencies.
-
 ```csharp
 public class DependentNode : Node, IDependent {
   // As long as there's a node which implements IProvider<MyObject> above us,
@@ -145,25 +140,49 @@ public class DependentNode : Node, IDependent {
 
 *Note*: If the dependency system can't find the correct provider in a dependent node's ancestors, it will search all of the autoloads for an autoload which implements the correct provider type. This allows you to "fallback" to global providers (should you want to).
 
-### Dependency Caveats
+## Dependency Caveats
 
 Like all dependency injection systems, there are a few corner cases you should be aware of.
 
-#### Removing and Re-adding Nodes
+### Removing and Re-adding Nodes
 
 If a node is removed from the tree and inserted somewhere else in the tree, it might try to use a cached version of the wrong provider. To prevent invalid
 situations like this, you should clear the dependency cache and recreate it when a node re-enters the tree. This can be accomplished by simply calling `this.Depend()` again from the dependent node, which will call `Loaded()` again.
 
 By placing provider nodes above all the possible parents of a node which depends on that value, you can ensure that a node will always be able to find the dependency it requests. Clever provider hierarchies will prevent most of these headaches.
 
-#### Dependency Deadlock
+### Dependency Deadlock
 
 If you initialize dependencies in a complex (or slow way) by failing to call `this.Provided()` from your provider's `_Ready()` method, there is a risk of seriously slowing down (or deadlocking) the dependency resolution in the children. `Loaded()` isn't called on child nodes using `this.Depend()` until **all** of the dependencies they depend on from the ancestor nodes have been provided, so `Loaded()` will only be invoked when the slowest dependency has been marked provided via `this.Provided()` in the ancestor provider node.
 
 To avoid this situation entirely, always initialize dependencies in your provider's `_Ready()` method and call `this.Provided()` immediately afterwards.
 
+### Performance Considerations
+
+What about performance? Dependency resolution runs in `O(n) * d` (worst case), where `n` is the depth of the dependent node in the scene tree and `d` is the number of dependencies required by your node. Once a node has found a provider for its dependency, further access is `O(1)` (instantaneous). GoDotDep only has to walk the ancestors once, checking to see if each ancestor matches any of the required dependencies.
+
+If needed, you can create another provider lower in your scene tree that also depends on a value above it and "reflects" it to its descendants down below. Re-providing a value lower in the tree above a large number of dependents can drastically shorten the length of the tree that must be searched for dependent nodes to resolve their dependencies.
+
+```csharp
+public class ReProvider : Node, IDependent, IProvider<MyObject> {
+  [Dependency]
+  private MyObject _object => this.DependOn<MyObject>();
+
+  MyObject IProvider<MyObject>.Get() => _object;
+
+  public override void _Ready() => this.Depend();
+
+  // Once the dependency is available to us, re-provide it to our
+  // descendants so they don't have to search as far for it.
+  // This optimization is probably only needed in really big scene trees.
+  public void Loaded() => this.Provided();
+}
+```
+
 <!-- Links -->
 
+[chickensoft-badge]: https://chickensoft.games/images/chickensoft/chickensoft_badge.svg
+[chickensoft-website]: https://chickensoft.games
 [discord]: https://discord.gg/gSjaPgMmYW
 [line-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_test/main/test/reports/line_coverage.svg
 [branch-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_test/main/test/reports/branch_coverage.svg
@@ -172,3 +191,4 @@ To avoid this situation entirely, always initialize dependencies in your provide
 [go_dot_dep_nuget]: https://www.nuget.org/packages/Chickensoft.GoDotDep/
 [provider]: https://pub.dev/packages/provider
 [call-down-signal-up]: https://kidscancode.org/godot_recipes/basics/node_communication/
+[godot-tree-order]: https://kidscancode.org/godot_recipes/basics/tree_ready_order/
