@@ -184,8 +184,8 @@ public class ReProvider : Node, IDependent, IProvider<MyObject> {
 [chickensoft-badge]: https://chickensoft.games/images/chickensoft/chickensoft_badge.svg
 [chickensoft-website]: https://chickensoft.games
 [discord]: https://discord.gg/gSjaPgMmYW
-[line-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_test/main/test/reports/line_coverage.svg
-[branch-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_test/main/test/reports/branch_coverage.svg
+[line-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_dep/main/test/reports/line_coverage.svg
+[branch-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_dep/main/test/reports/branch_coverage.svg
 [go_dot_test]: https://github.com/chickensoft-games/go_dot_test
 [Chickensoft]: https://github.com/chickensoft-games
 [go_dot_dep_nuget]: https://www.nuget.org/packages/Chickensoft.GoDotDep/
