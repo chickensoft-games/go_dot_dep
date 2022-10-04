@@ -18,7 +18,8 @@ namespace GoDotDep {
 
   /// <summary>
   /// Exception thrown if another class implements <see cref="IDependent"/> and
-  /// tries to call <see cref="IDependentExtension.Depend(IDependent)"/>.
+  /// tries to call
+  /// <see cref="IDependentExtension.Depend(IDependent, Dictionary{Type, Func{object}}?)"/>.
   /// </summary>
   public class DependentNotAGodotNodeException : InvalidOperationException {
     /// <summary>Creates a new exception.</summary>
@@ -29,8 +30,8 @@ namespace GoDotDep {
 
   /// <summary>
   /// Exception thrown when an <see cref="IDependent"/> node calls
-  /// <see cref="IDependentExtension.Depend(IDependent)"/> before a provider has
-  /// provided the value for a dependency.
+  /// <see cref="IDependentExtension.Depend(IDependent, Dictionary{Type, Func{object}}?)"/>
+  /// before a provider has provided the value for a dependency.
   /// </summary>
   public class ProviderNotReadyException : InvalidOperationException {
     /// <summary>Creates a new provider not ready exception.</summary>

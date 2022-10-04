@@ -19,6 +19,18 @@ namespace GoDotDep {
   }
 
   /// <summary>
+  /// Default provider used internally to provide fallback values. Providing
+  /// fallback values in `this.Depend()` from your dependent node enables your
+  /// scene to be tested by itself without needing any providers in the tree
+  /// above it.
+  /// </summary>
+  internal class DefaultProvider : IProviderNode {
+    public Func<object> Get { get; init; }
+
+    public DefaultProvider(Func<object> get) => Get = get;
+  }
+
+  /// <summary>
   /// Extension for <see cref="IProviderNode" /> that allows providers to call
   /// <see cref="Provided(IProviderNode)"/>.
   /// </summary>
