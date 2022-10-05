@@ -141,6 +141,29 @@ public class DependentNode : Node, IDependent {
 
 *Note*: If the dependency system can't find the correct provider in a dependent node's ancestors, it will search all of the autoloads for an autoload which implements the correct provider type. This allows you to "fallback" to global providers (should you want to).
 
+## Default Dependencies
+
+GoDotDep allows dependent nodes to specify default dependency values to use if a provider for a type of value can't be found. Specifying default dependency values allow you to run a scene by itself without any providers above it in the tree, allowing for easier testing and faster iteration.
+
+To provide default values, simply pass a dictionary containing the entries you'd like to use if providers can't be found to `this.Depend()`. Each key is the type of the object you'd like to provide, while each value should be a function which returns an instance of the specified type.
+
+```csharp
+public class DependentNode : Node, IDependent {
+  [Dependency]
+  public MyObject ValueA => this.DependOn<MyObject>();
+
+  public override void _Ready() {
+    this.Depend(new() {
+      // This instance of MyObject will be returned above if you run this scene
+      // without a Provider<MyObject> above it in the tree. :)
+      [typeof(MyObject)] = () => new MyObject()
+    });
+  }
+
+  public void Loaded() { }
+}
+```
+
 ## Dependency Caveats
 
 Like all dependency injection systems, there are a few corner cases you should be aware of.

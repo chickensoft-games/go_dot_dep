@@ -16,8 +16,8 @@ namespace GoDotDep {
     /// from the providers that it depends on.
     ///
     /// For this method to be called, you must call
-    /// <see cref="IDependentExtension.Depend(IDependent)"/> from your dependent node's
-    /// _Ready method.
+    /// <see cref="IDependentExtension.Depend(IDependent, Dictionary{Type, Func{object}}?)"/>
+    /// from your dependent node's _Ready method.
     /// </summary>
     public void Loaded();
   }
@@ -25,8 +25,8 @@ namespace GoDotDep {
 
   /// <summary>
   /// Extension class which supplies the
-  /// <see cref="Depend(IDependent)"/> method to Godot
-  /// nodes that implement <see cref="IDependent"/>.
+  /// <see cref="Depend(IDependent, Dictionary{Type, Func{object}}?)"/>
+  /// method to Godot nodes that implement <see cref="IDependent"/>.
   /// </summary>
   public static class IDependentExtension {
     // Essentially a typedef for a Dictionary that maps Types to object getters.
@@ -72,6 +72,9 @@ namespace GoDotDep {
       where TValue : class {
       var dependencyTable = GetDeps(dependent);
       if (dependencyTable.TryGetValue(typeof(TValue), out var providerNode)) {
+        if (providerNode is DefaultProvider defaultProvider) {
+          return (TValue)defaultProvider.Get();
+        }
         if (!providerNode.HasProvided()) {
           throw new ProviderNotReadyException(typeof(TValue));
         }
@@ -95,7 +98,15 @@ namespace GoDotDep {
     /// that called this method.
     /// </summary>
     /// <param name="dependent">Dependent node which invoked the method.</param>
-    public static void Depend(this IDependent dependent) {
+    /// <param name="defaultValues">Dictionary which maps types to functions
+    /// that return an instance of that type. Used as fallback values when
+    /// no provider can be found for dependencies of that type.<br />
+    /// Providing a dictionary of default values can enable your scene to be
+    /// run by itself from the editor with test data.</param>
+    public static void Depend(
+      this IDependent dependent,
+      Dictionary<Type, Func<object>>? defaultValues = null
+    ) {
       // Clear any existing dependency cache.
       dependent.SetDeps(new());
 
@@ -148,8 +159,10 @@ namespace GoDotDep {
         if (numTypesToDependOn == 0) {
           dependent.Loaded();
         }
-        provider.StopListening(onDependencyLoaded);
-      };
+        if (provider is not DefaultProvider) {
+          provider.StopListening(onDependencyLoaded);
+        }
+      }
 
       var ancestor = node.GetParent();
 
@@ -196,6 +209,20 @@ namespace GoDotDep {
       }
 
       finishSearch:
+      if (defaultValues != null) {
+        // Create default providers to provide any given fallback values.
+        var typesFound = new HashSet<Type>();
+        foreach (var type in typesNeeded) {
+          if (defaultValues.ContainsKey(type)) {
+            var provider = new DefaultProvider(defaultValues[type]);
+            dependencyTable[type] = provider;
+            onDependencyLoaded(provider);
+            typesFound.Add(type);
+          }
+        }
+        typesNeeded.ExceptWith(typesFound);
+      }
+
       if (typesNeeded.Count != 0) {
         throw new ProviderNotFoundException(providerTypes: typesNeeded);
       }

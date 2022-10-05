@@ -6,6 +6,9 @@ using Shouldly;
 
 public class TestDummyValueA { }
 public class TestDummyValueB { }
+public record TestDummyValueC {
+  public string Name { get; init; } = "Default value";
+}
 
 public class TestProviderOneNode : Node, IProvider<TestDummyValueA> {
   private readonly TestDummyValueA _value;
@@ -70,6 +73,24 @@ public class TestProviderNodeWithoutProvided : Node, IProvider<TestDummyValueA> 
   public TestDummyValueA Get() => new();
 
   // This one never calls this.Provided()!
+}
+
+public class TestDependentWithDefaultValue : Node, IDependent {
+  [Dependency]
+  public TestDummyValueC ValueA => this.DependOn<TestDummyValueC>();
+
+  private Action _loadedCallback { get; init; }
+
+  public TestDependentWithDefaultValue(
+    Action loadedCallback
+    ) => _loadedCallback = loadedCallback;
+
+  public override void _Ready() => this.Depend(new() {
+    [typeof(TestDummyValueC)] =
+      () => new TestDummyValueC() { Name = nameof(TestDependentWithDefaultValue) }
+  });
+
+  public void Loaded() => _loadedCallback();
 }
 
 public class TestDependentNotANode : IDependent {
@@ -209,6 +230,17 @@ public class DependencyTest : TestClass {
     loadedCalled.ShouldBeFalse();
     providerTwo.AddChild(dependent);
     dependent._Ready();
+    loadedCalled.ShouldBeTrue();
+  }
+
+  [Test]
+  public void DependCreatesProvidersForDefaultValues() {
+    var loadedCalled = false;
+    var dependent = new TestDependentWithDefaultValue(
+      loadedCallback: () => loadedCalled = true
+    );
+    dependent._Ready();
+    dependent.ValueA.Name.ShouldBe(nameof(TestDependentWithDefaultValue));
     loadedCalled.ShouldBeTrue();
   }
 }

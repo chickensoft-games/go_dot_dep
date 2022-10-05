@@ -21,6 +21,7 @@
     "Shouldly",
     "targetargs",
     "targetdir",
+    "typeof",
     "typeparam",
     "typeparamref"
   ]
