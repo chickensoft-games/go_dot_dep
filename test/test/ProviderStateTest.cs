@@ -1,7 +1,9 @@
+namespace GoDotDepTests;
 using Godot;
 using GoDotDep;
 using GoDotTest;
-using Moq;
+using LightMock.Generator;
+using Shouldly;
 
 public class IProviderExtensionTest : TestClass {
   public IProviderExtensionTest(Node testScene) : base(testScene) { }
@@ -10,7 +12,6 @@ public class IProviderExtensionTest : TestClass {
   public void AnnounceDoesNothingWhenNoEvents() {
     var node = new Mock<IProviderNode>();
     var state = new ProviderState();
-    state.Announce(node.Object);
-    // nothing to expect
+    Should.NotThrow(() => state.Announce(node.Object));
   }
 }

@@ -113,7 +113,7 @@ public void Loaded() {
  In `Loaded()`, dependent nodes are guaranteed to be able to access their dependency values. Below is a complete example.
 
 ```csharp
-public class DependentNode : Node, IDependent {
+public partial class DependentNode : Node, IDependent {
   // As long as there's a node which implements IProvider<MyObject> above us,
   // we will be able to access this object once `Loaded()` is called.
   [Dependency]
@@ -148,7 +148,7 @@ GoDotDep allows dependent nodes to specify default dependency values to use if a
 To provide default values, simply pass a dictionary containing the entries you'd like to use if providers can't be found to `this.Depend()`. Each key is the type of the object you'd like to provide, while each value should be a function which returns an instance of the specified type.
 
 ```csharp
-public class DependentNode : Node, IDependent {
+public partial class DependentNode : Node, IDependent {
   [Dependency]
   public MyObject ValueA => this.DependOn<MyObject>();
 
@@ -188,7 +188,7 @@ What about performance? Dependency resolution runs in `O(n) * d` (worst case), w
 If needed, you can create another provider lower in your scene tree that also depends on a value above it and "reflects" it to its descendants down below. Re-providing a value lower in the tree above a large number of dependents can drastically shorten the length of the tree that must be searched for dependent nodes to resolve their dependencies.
 
 ```csharp
-public class ReProvider : Node, IDependent, IProvider<MyObject> {
+public partial class ReProvider : Node, IDependent, IProvider<MyObject> {
   [Dependency]
   private MyObject _object => this.DependOn<MyObject>();
 
