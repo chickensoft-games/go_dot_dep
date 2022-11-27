@@ -1,3 +1,4 @@
+namespace GoDotDepTests;
 using System.Collections.Generic;
 using Godot;
 using GoDotDep;

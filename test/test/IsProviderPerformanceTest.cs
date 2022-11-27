@@ -1,3 +1,4 @@
+namespace GoDotDepTests;
 using System.Diagnostics;
 using Godot;
 using GoDotDep;
