@@ -11,7 +11,7 @@ public record TestDummyValueC {
   public string Name { get; init; } = "Default value";
 }
 
-public class TestProviderOneNode : Node, IProvider<TestDummyValueA> {
+public partial class TestProviderOneNode : Node, IProvider<TestDummyValueA> {
   private readonly TestDummyValueA _value;
 
   public TestProviderOneNode(TestDummyValueA value) => _value = value;
@@ -21,7 +21,7 @@ public class TestProviderOneNode : Node, IProvider<TestDummyValueA> {
   public override void _Ready() => this.Provided();
 }
 
-public class TestProviderTwoNode : Node, IProvider<TestDummyValueB> {
+public partial class TestProviderTwoNode : Node, IProvider<TestDummyValueB> {
   private readonly TestDummyValueB _value;
 
   public TestProviderTwoNode(TestDummyValueB value) => _value = value;
@@ -31,7 +31,7 @@ public class TestProviderTwoNode : Node, IProvider<TestDummyValueB> {
   public override void _Ready() => this.Provided();
 }
 
-public class TestDependentNode : Node, IDependent {
+public partial class TestDependentNode : Node, IDependent {
   private Action<TestDependentNode> _loadedCallback { get; init; }
 
   public TestDependentNode(
@@ -54,7 +54,7 @@ public class TestDependentNode : Node, IDependent {
   public void Loaded() => _loadedCallback(this);
 }
 
-public class TestDependentNodeOneValue : Node, IDependent {
+public partial class TestDependentNodeOneValue : Node, IDependent {
   [Dependency]
   public TestDummyValueA ValueA => this.DependOn<TestDummyValueA>();
 
@@ -63,20 +63,20 @@ public class TestDependentNodeOneValue : Node, IDependent {
   public void Loaded() { }
 }
 
-public class TestDependentNodeWithoutDepend : Node, IDependent {
+public partial class TestDependentNodeWithoutDepend : Node, IDependent {
   [Dependency]
   public TestDummyValueA ValueA => this.DependOn<TestDummyValueA>();
 
   public void Loaded() { }
 }
 
-public class TestProviderNodeWithoutProvided : Node, IProvider<TestDummyValueA> {
+public partial class TestProviderNodeWithoutProvided : Node, IProvider<TestDummyValueA> {
   public TestDummyValueA Get() => new();
 
   // This one never calls this.Provided()!
 }
 
-public class TestDependentWithDefaultValue : Node, IDependent {
+public partial class TestDependentWithDefaultValue : Node, IDependent {
   [Dependency]
   public TestDummyValueC ValueA => this.DependOn<TestDummyValueC>();
 
@@ -94,14 +94,14 @@ public class TestDependentWithDefaultValue : Node, IDependent {
   public void Loaded() => _loadedCallback();
 }
 
-public class TestDependentNotANode : IDependent {
+public partial class TestDependentNotANode : IDependent {
   // This one doesn't inherit from Godot.Node!
 
   public void Ready() => this.Depend();
   public void Loaded() { }
 }
 
-public class TestDependentWithNoDependencies : Node, IDependent {
+public partial class TestDependentWithNoDependencies : Node, IDependent {
   public override void _Ready() => this.Depend();
   public void Loaded() { }
 }

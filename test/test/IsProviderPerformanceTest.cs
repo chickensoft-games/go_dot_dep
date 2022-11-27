@@ -5,10 +5,11 @@ using GoDotDep;
 using GoDotTest;
 using Shouldly;
 
+public partial class TestProviderNode : Node, IProvider<string> {
+  public string Get() => "hello, world!";
+}
+
 public class IsProviderPerformanceTest : TestClass {
-  public class TestProviderNode : Node, IProvider<string> {
-    public string Get() => "hello, world!";
-  }
 
   private const long ITERATIONS = 250_000;
 
