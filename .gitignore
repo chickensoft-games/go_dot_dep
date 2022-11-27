@@ -4,8 +4,8 @@ export.cfg
 export_presets.cfg
 
 # Code coverage
-coverage.info
-coverage/
+test/coverage/*
+!*test/coverage/*.gdignore
 
 # Imported translations (automatically generated from CSV files)
 *.translation
