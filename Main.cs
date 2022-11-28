@@ -1,6 +1,5 @@
 namespace GoDotDep;
 
-using System;
 using Godot;
 
 /// <summary>
