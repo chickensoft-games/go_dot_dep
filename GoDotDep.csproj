@@ -14,7 +14,7 @@
     <Company>Chickensoft</Company>
 
     <PackageId>Chickensoft.GoDotDep</PackageId>
-    <PackageVersion>1.2.0-beta6</PackageVersion>
+    <PackageVersion>1.2.1-beta6</PackageVersion>
     <PackageReleaseNotes>GoDotDep release.</PackageReleaseNotes>
     <PackageIcon></PackageIcon>
     <PackageTags>Godot;Dependency;Dependencies;DI;Dependency Injection;Loader;Injector;Chickensoft;Gamedev;Utility;Utilities</PackageTags>
