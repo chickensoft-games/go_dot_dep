@@ -5,7 +5,9 @@ using GoDotDep;
 using GoDotTest;
 using Shouldly;
 
-public class TestDummyValueA { }
+public class ITestDummyValueA { }
+
+public class TestDummyValueA : ITestDummyValueA { }
 public class TestDummyValueB { }
 public record TestDummyValueC {
   public string Name { get; init; } = "Default value";
@@ -17,6 +19,16 @@ public partial class TestProviderOneNode : Node, IProvider<TestDummyValueA> {
   public TestProviderOneNode(TestDummyValueA value) => _value = value;
 
   public TestDummyValueA Get() => _value;
+
+  public override void _Ready() => this.Provided();
+}
+
+public partial class TestProviderSubtype : Node, IProvider<ITestDummyValueA> {
+  private readonly TestDummyValueA _value;
+
+  public TestProviderSubtype(TestDummyValueA value) => _value = value;
+
+  public ITestDummyValueA Get() => _value;
 
   public override void _Ready() => this.Provided();
 }
@@ -243,5 +255,16 @@ public class DependencyTest : TestClass {
     dependent._Ready();
     dependent.ValueA.Name.ShouldBe(nameof(TestDependentWithDefaultValue));
     loadedCalled.ShouldBeTrue();
+  }
+
+  [Test]
+  public void DependentRequestingSupertypeOfProvidedTypeThrows() {
+    var provider = new TestProviderSubtype(new TestDummyValueA());
+    var dependent = new TestDependentNodeOneValue();
+    provider.AddChild(dependent);
+    provider._Ready();
+    Should.Throw<DependentRequestedSupertypeException>(
+      () => dependent._Ready()
+    );
   }
 }
