@@ -232,7 +232,8 @@ public static class IDependentExtension {
   // IProvider<genericType>. There's a crude performance test that measures
   // the speed of these reflection metadata methods in in
   // test/IsProviderPerformanceTest.cs. In general, this should be plenty
-  // fast for most every use case.
+  // fast for most every use case. Since providers are cached once found,
+  // performance could only be an issue when a node is first added to the scene.
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   internal static bool IsProvider(this Type type, Type genericType) {
     if (type.IsInterface && type.IsGenericType &&
@@ -244,7 +245,22 @@ public static class IDependentExtension {
         i.IsGenericType &&
         i.GetGenericTypeDefinition() == typeof(IProvider<>)
       ) {
-        return i.GetGenericArguments()[0] == genericType;
+        var providedType = i.GetGenericArguments()[0];
+        // as a dependent, it's easy to accidentally request a supertype of
+        // a provided type, such as `GameState` instead of the provided
+        // `IGameState`. throwing an error in this scenario prevents
+        // type collision in the provider hierarchy and informs the developer
+        // if they make this mistake, saving them valuable debugging time.
+        if (
+          providedType != genericType &&
+          providedType.IsAssignableFrom(genericType)
+        ) {
+          throw new DependentRequestedSupertypeException(
+            requestedType: genericType,
+            providedType: providedType
+          );
+        }
+        return providedType == genericType;
       }
     }
     return false;

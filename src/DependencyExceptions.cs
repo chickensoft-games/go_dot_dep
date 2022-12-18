@@ -16,6 +16,16 @@ public class ProviderNotFoundException : InvalidOperationException {
   ) { }
 }
 
+public class DependentRequestedSupertypeException : InvalidOperationException {
+  public DependentRequestedSupertypeException(
+    Type requestedType, Type providedType
+  ) : base(
+    $"The requested dependency type `{requestedType.Name}` is a supertype " +
+    $"of the provided type `{providedType.Name}`. Please request the " +
+    $"provided type `{providedType.Name}` instead."
+  ) { }
+}
+
 /// <summary>
 /// Exception thrown if another class implements <see cref="IDependent"/> and
 /// tries to call
