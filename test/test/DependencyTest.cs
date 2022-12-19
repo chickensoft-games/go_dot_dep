@@ -23,6 +23,22 @@ public partial class TestProviderOneNode : Node, IProvider<TestDummyValueA> {
   public override void _Ready() => this.Provided();
 }
 
+public partial class TestMultiProviderNode
+  : Node, IProvider<TestDummyValueA>, IProvider<TestDummyValueB> {
+  private readonly TestDummyValueA _a;
+  private readonly TestDummyValueB _b;
+
+  public TestMultiProviderNode(TestDummyValueA a, TestDummyValueB b) {
+    _a = a;
+    _b = b;
+  }
+
+  TestDummyValueA IProvider<TestDummyValueA>.Get() => _a;
+  TestDummyValueB IProvider<TestDummyValueB>.Get() => _b;
+
+  public override void _Ready() => this.Provided();
+}
+
 public partial class TestProviderSubtype : Node, IProvider<ITestDummyValueA> {
   private readonly TestDummyValueA _value;
 
@@ -266,5 +282,24 @@ public class DependencyTest : TestClass {
     Should.Throw<DependentRequestedSupertypeException>(
       () => dependent._Ready()
     );
+  }
+
+  [Test]
+  public void MultiProviderProvidesMultipleValues() {
+    var a = new TestDummyValueA();
+    var b = new TestDummyValueB();
+    var provider = new TestMultiProviderNode(a, b);
+    var loadedCalled = false;
+    var dependent = new TestDependentNode(
+      loadedCallback: (node) => {
+        loadedCalled = true;
+        node.ValueA.ShouldBe(a);
+        node.ValueB.ShouldBe(b);
+      }
+    );
+    provider.AddChild(dependent);
+    provider._Ready();
+    dependent._Ready();
+    loadedCalled.ShouldBeTrue();
   }
 }
