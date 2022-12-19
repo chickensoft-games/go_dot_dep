@@ -16,7 +16,16 @@ public class ProviderNotFoundException : InvalidOperationException {
   ) { }
 }
 
+/// <summary>
+/// Exception thrown when a dependent requests a dependency that is a supertype
+/// of a provided type.
+/// </summary>
 public class DependentRequestedSupertypeException : InvalidOperationException {
+  /// <summary>
+  /// Creates a new dependent-requested-supertype exception.
+  /// </summary>
+  /// <param name="requestedType">The requested dependency type.</param>
+  /// <param name="providedType">The provided dependency type.</param>
   public DependentRequestedSupertypeException(
     Type requestedType, Type providedType
   ) : base(
