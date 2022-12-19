@@ -260,7 +260,7 @@ public static class IDependentExtension {
             providedType: providedType
           );
         }
-        return providedType == genericType;
+        if (providedType == genericType) { return true; }
       }
     }
     return false;
