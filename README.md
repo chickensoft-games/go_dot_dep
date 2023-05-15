@@ -4,6 +4,8 @@
 
 Node-based dependency injection for C# Godot games.
 
+> 🧨💥 This package is no longer maintained and has been superseded by ✨ [AutoInject] ✨. AutoInject works with the [SuperNodes] source generator to remove the need for runtime reflection, all while implementing the magic of node-based dependency injection!
+
 GoDotDep allows you to create nodes which declare dependencies on values provided by ancestor nodes in the scene tree. No more passing values all the way down the tree manually! GoDotDep is loosely inspired by [other popular dependency injection systems][provider] where trees are involved.
 
 GoDotDep is designed to make injecting dependencies into child nodes easier by allowing nodes to provide values, cache the provider nodes which provide dependencies from dependent nodes, and access the dependency values provided.
@@ -108,7 +110,7 @@ public void Loaded() {
 }
 ```
 
-> Internally, `this.Depend()` will look up all of the properties of your node which have a `[Dependency]` attribute and cache their providers for future access. If a provider hasn't initialized a dependency, hooks will be registered which call your dependent node's `Loaded()` method once all the dependencies are available. 
+> Internally, `this.Depend()` will look up all of the properties of your node which have a `[Dependency]` attribute and cache their providers for future access. If a provider hasn't initialized a dependency, hooks will be registered which call your dependent node's `Loaded()` method once all the dependencies are available.
 
  In `Loaded()`, dependent nodes are guaranteed to be able to access their dependency values. Below is a complete example.
 
@@ -210,6 +212,8 @@ public partial class ReProvider : Node, IDependent, IProvider<MyObject> {
 [discord]: https://discord.gg/gSjaPgMmYW
 [line-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_dep/main/test/reports/line_coverage.svg
 [branch-coverage]: https://raw.githubusercontent.com/chickensoft-games/go_dot_dep/main/test/reports/branch_coverage.svg
+[AutoInject]: https://github.com/chickensoft-games/AutoInject
+[SuperNodes]: https://github.com/chickensoft-games/SuperNodes
 [go_dot_test]: https://github.com/chickensoft-games/go_dot_test
 [Chickensoft]: https://github.com/chickensoft-games
 [go_dot_dep_nuget]: https://www.nuget.org/packages/Chickensoft.GoDotDep/

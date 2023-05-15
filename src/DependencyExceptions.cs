@@ -17,19 +17,22 @@ public class ProviderNotFoundException : InvalidOperationException {
 }
 
 /// <summary>
-/// Exception thrown when a dependent requests a dependency that is a supertype
-/// of a provided type.
+/// Exception thrown when a dependent requests a dependency that is a subtype
+/// of a provided type. For example, the provided type is IGameState, but the
+/// dependency requested GameState, a more concrete subtype of what's actually
+/// provided. As a user, it's easy to forget that you must request the exact
+/// type.
 /// </summary>
-public class DependentRequestedSupertypeException : InvalidOperationException {
+public class DependentRequestedSubtypeException : InvalidOperationException {
   /// <summary>
   /// Creates a new dependent-requested-supertype exception.
   /// </summary>
   /// <param name="requestedType">The requested dependency type.</param>
   /// <param name="providedType">The provided dependency type.</param>
-  public DependentRequestedSupertypeException(
+  public DependentRequestedSubtypeException(
     Type requestedType, Type providedType
   ) : base(
-    $"The requested dependency type `{requestedType.Name}` is a supertype " +
+    $"The requested dependency type `{requestedType.Name}` is a subtype " +
     $"of the provided type `{providedType.Name}`. Please request the " +
     $"provided type `{providedType.Name}` instead."
   ) { }

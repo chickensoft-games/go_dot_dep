@@ -246,7 +246,7 @@ public static class IDependentExtension {
         i.GetGenericTypeDefinition() == typeof(IProvider<>)
       ) {
         var providedType = i.GetGenericArguments()[0];
-        // as a dependent, it's easy to accidentally request a supertype of
+        // as a dependent, it's easy to accidentally request a subtype of
         // a provided type, such as `GameState` instead of the provided
         // `IGameState`. throwing an error in this scenario prevents
         // type collision in the provider hierarchy and informs the developer
@@ -255,7 +255,7 @@ public static class IDependentExtension {
           providedType != genericType &&
           providedType.IsAssignableFrom(genericType)
         ) {
-          throw new DependentRequestedSupertypeException(
+          throw new DependentRequestedSubtypeException(
             requestedType: genericType,
             providedType: providedType
           );

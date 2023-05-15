@@ -274,12 +274,12 @@ public class DependencyTest : TestClass {
   }
 
   [Test]
-  public void DependentRequestingSupertypeOfProvidedTypeThrows() {
+  public void DependentRequestingSubtypeOfProvidedTypeThrows() {
     var provider = new TestProviderSubtype(new TestDummyValueA());
     var dependent = new TestDependentNodeOneValue();
     provider.AddChild(dependent);
     provider._Ready();
-    Should.Throw<DependentRequestedSupertypeException>(
+    Should.Throw<DependentRequestedSubtypeException>(
       () => dependent._Ready()
     );
   }
